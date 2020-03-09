@@ -2,3 +2,4 @@ dask-worker-space/
 *.csv
 *.model
 .vscode
+songs.pickle

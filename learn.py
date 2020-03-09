@@ -6,6 +6,7 @@ import nltk.corpus
 import multiprocessing as mp
 import tqdm
 import numpy as np
+import pickle
 
 lmtzr = WordNetLemmatizer()
 
@@ -14,16 +15,14 @@ stop_words = set(stopwords.words("english"))
 
 def clean(song):
     lyric, title = song
-    try:
-        cleaned_lyric = [
-            lmtzr.lemmatize(word)
-            for word in lyric
-            if ((word != "") and word not in stop_words)
-        ]
-        cleaned_lyric.append(title)
-        return cleaned_lyric, title
-    except:
-        return None, None
+
+    cleaned_lyric = [
+        lmtzr.lemmatize(word.strip())
+        for word in lyric
+        if ((word != "") and word not in stop_words)
+    ]
+    cleaned_lyric.append(title)
+    return cleaned_lyric
 
 
 if __name__ == "__main__":
@@ -51,19 +50,16 @@ if __name__ == "__main__":
 
     pool = mp.Pool()
     songs = []
-    valid_titles = []
     for result in tqdm.tqdm(
         pool.imap_unordered(clean, zip(lyrics, titles)), total=len(titles)
     ):
-        if not result[0]:
-            continue
-        else:
-            valid_titles.append(result[1])
-            songs.append(result[0])
+        songs.append(result)
     pool.close()
     pool.join()
 
-    pd.DataFrame(valid_titles).to_csv("titles.csv")
+    with open("songs.pickle", "wb") as f:
+        pickle.dump(songs, f)
+        # songs = pickle.load(f)
 
     model = Word2Vec(songs, min_count=1, size=300, workers=8, window=3)
     model.save("word2vec.model")

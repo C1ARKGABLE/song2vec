@@ -29,7 +29,9 @@ def clean(song):
 if __name__ == "__main__":
 
     df = pd.read_csv("lyrics.csv")
-    df = df[df["lyrics"].astype(bool)]
+    df.dropna(subset=["lyrics"], inplace=True)
+    df = df[df["lyrics"] != "[Instrumental]"]
+    # df.sort_values("year", inplace=True, ascending=True)
 
     df["Title_Artist"] = df["song"].str.lower() + " by " + df["artist"].str.lower()
 

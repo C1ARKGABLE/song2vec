@@ -6,11 +6,15 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 model = Word2Vec.load("word2vec.model")
-df = pd.read_csv("lyrics.csv")
+# df = pd.read_csv("lyrics.csv")
 
-df["Title_Artist"] = df["Track Name"] + " by " + df["Artist Name"]
+# df["Title_Artist"] = df["Track Name"] + " by " + df["Artist Name"]
 
-titles = df["Title_Artist"].values.tolist()[:32]
+# titles = df["Title_Artist"].values.tolist()[:32]
+with open("titles.pickle", "rb") as f:
+    # pickle.dump(songs, f)
+    titles = pickle.load(f)[:1]
+    print(titles)
 
 
 def cosine_distance(model, word, target_list, num):
